@@ -108,6 +108,19 @@ textarea.inp{resize:none;line-height:1.6;}
   <div class="success-title" id="success-title">הדוח נשלח בהצלחה!</div>
   <div class="success-sub" id="success-detail">תודה. הדוח התקבל ויעובד על ידי בני פרסקי.</div>
   <div class="success-ref" id="success-ref" style="display:none;"></div>
+  <a id="success-wa-btn" href="#" target="_blank" rel="noopener noreferrer"
+     style="display:none;margin-top:20px;padding:16px 28px;background:linear-gradient(135deg,#25d366,#128c7e);
+            color:white;border-radius:14px;font-family:'Heebo',sans-serif;font-size:16px;font-weight:900;
+            text-decoration:none;text-align:center;">
+    📲 שלח סיכום לבני בוואטסאפ
+  </a>
+  <div id="success-copy-row" style="display:none;margin-top:10px;">
+    <button onclick="copySuccessMsg()"
+            style="padding:10px 20px;background:none;border:1.5px solid #dde1e7;border-radius:10px;
+                   font-family:'Heebo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:#555;">
+      📋 העתק סיכום
+    </button>
+  </div>
 </div>
 
 <div id="error-screen">
@@ -261,12 +274,12 @@ textarea.inp{resize:none;line-height:1.6;}
 <div id="toast"></div>
 
 <script>
-// ── SUPABASE ──────────────────────────────────────────────────────
+//    SUPABASE                                                       
 const SB_URL = 'https://vmcipofovheztbjmhwsl.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtY2lwb2ZvdmhlenRiam1od3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjE2MTcsImV4cCI6MjA4NzAzNzYxN30.LPq5N2Xo8iEqjgz2UhmdzUdh5tpGT3EYzSxJcYBEJ1w';
 const SB_H   = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
 
-// ── STATE ─────────────────────────────────────────────────────────
+//    STATE                                                          
 var requestData = null;
 var workers     = 0;
 var weather     = '';
@@ -274,7 +287,7 @@ var rating      = 0;
 var photos      = [];
 var reportNum   = null;  // unique report number for tracking
 
-// ── INIT ──────────────────────────────────────────────────────────
+//    INIT                                                           
 document.addEventListener('DOMContentLoaded', initForm);
 
 async function initForm() {
@@ -322,7 +335,7 @@ async function initForm() {
 
 function fillHeader(data) {
   document.getElementById('meta-contractor').textContent = data ? data.contractor_name : 'עצמאי';
-  document.getElementById('meta-project').textContent    = data ? data.project_name    : '—';
+  document.getElementById('meta-project').textContent    = data ? data.project_name    : '--';
   document.getElementById('meta-date').textContent       = data
     ? formatDate(data.report_date)
     : formatDate(new Date().toISOString().slice(0,10));
@@ -346,12 +359,57 @@ function showSuccess(title, detail, ref) {
   document.getElementById('success-screen').style.display  = 'flex';
   document.getElementById('success-title').textContent  = title;
   document.getElementById('success-detail').textContent = detail;
+
   var refEl = document.getElementById('success-ref');
-  if (ref) { refEl.textContent = '📋 מספר דוח: ' + ref; refEl.style.display = 'block'; }
-  else { refEl.style.display = 'none'; }
+  if (ref) { refEl.textContent = 'מספר דוח: ' + ref; refEl.style.display = 'block'; }
+  else      { refEl.style.display = 'none'; }
+
+  var waBtn  = document.getElementById('success-wa-btn');
+  var cpyRow = document.getElementById('success-copy-row');
+  if (ref) {
+    var contractor = requestData ? requestData.contractor_name : (document.getElementById('f-submitted-by') ? document.getElementById('f-submitted-by').value : '');
+    var project    = requestData ? requestData.project_name    : '--';
+    var date       = requestData ? requestData.report_date     : new Date().toISOString().slice(0,10);
+    var activities = document.getElementById('f-activities') ? document.getElementById('f-activities').value.trim() : '';
+    var issues     = document.getElementById('f-issues')     ? document.getElementById('f-issues').value.trim()     : '';
+    var workers_n  = typeof workers !== 'undefined' ? workers : 0;
+    var weather_s  = typeof weather !== 'undefined' && weather ? weather : '';
+    var rating_s   = typeof rating  !== 'undefined' && rating  ? new Array(rating+1).join('*') : '';
+
+    var NL = '\n';
+    _successMsg =
+      'דוח עבודה יומי ' + (ref || '') + NL +
+      '--------------------' + NL +
+      'קבלן: '      + contractor + NL +
+      'פרויקט: '    + project    + NL +
+      'תאריך: '     + date       + NL +
+      (weather_s  ? 'מזג אוויר: ' + weather_s + NL : '') +
+      'פועלים: '    + workers_n  + NL +
+      (activities ? 'עבודות: '   + activities + NL : '') +
+      (issues     ? 'בעיות: '    + issues     + NL : '') +
+      (rating_s   ? 'דירוג: '    + rating_s   + NL : '') +
+      '--------------------' + NL +
+      'נשלח דרך Site Pulse';
+
+    var beniPhone = '972523536239';
+    waBtn.href = 'https://wa.me/' + beniPhone + '?text=' + encodeURIComponent(_successMsg);
+    waBtn.style.display = 'block';
+    cpyRow.style.display = 'block';
+  } else {
+    waBtn.style.display  = 'none';
+    cpyRow.style.display = 'none';
+  }
 }
 
-// ── FORM CONTROLS ─────────────────────────────────────────────────
+var _successMsg = '';
+function copySuccessMsg() {
+  if (!_successMsg) return;
+  navigator.clipboard.writeText(_successMsg)
+    .then(function(){ toast('הסיכום הועתק'); })
+    .catch(function(){ toast('העתק ידנית'); });
+}
+
+//    FORM CONTROLS                                                  
 function setWeather(btn) {
   document.querySelectorAll('.weather-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -380,7 +438,7 @@ function handlePhotos(input) {
   });
 }
 
-// ── VOICE INPUT ───────────────────────────────────────────────────
+//    VOICE INPUT                                                    
 var _voiceActive = null;
 var _recognition = null;
 
@@ -393,7 +451,7 @@ function toggleVoice(fieldId, btnId) {
   var field = document.getElementById(fieldId);
   var hint  = document.getElementById('vhint-' + fieldId.replace('f-',''));
 
-  // If already recording this field — stop
+  // If already recording this field   stop
   if (_voiceActive === fieldId) {
     if (_recognition) _recognition.stop();
     return;
@@ -444,7 +502,7 @@ function stopVoice(btn, hint) {
   if (hint) hint.textContent = '';
 }
 
-// ── SUBMIT ────────────────────────────────────────────────────────
+//    SUBMIT                                                         
 async function submitReport() {
   var submittedBy = document.getElementById('f-submitted-by').value.trim();
   var activities  = document.getElementById('f-activities').value.trim();
@@ -464,7 +522,7 @@ async function submitReport() {
     var now   = new Date().toISOString();
 
     var payload = {
-      // ── matched exactly to site_reports table columns ──────────
+      //    matched exactly to site_reports table columns           
       contractor_id:   requestData ? requestData.contractor_id   : null,
       project_id:      requestData ? requestData.project_id      : null,
       contractor_name: requestData ? requestData.contractor_name : submittedBy,
@@ -474,19 +532,19 @@ async function submitReport() {
       submitted_by:    submittedBy,
       weather:         weather   || null,
       workers_count:   workers,
-      activities:      activities,                        // → activities column
-      tasks_done:      activities,                        // → legacy tasks_done column (same value)
+      activities:      activities,                        //   activities column
+      tasks_done:      activities,                        //   legacy tasks_done column (same value)
       tools_equipment: document.getElementById('f-tools').value.trim()   || null,
       issues:          document.getElementById('f-issues').value.trim()  || null,
       remarks:         document.getElementById('f-remarks').value.trim() || null,
       day_rating:      rating    || null,
-      photos:          photos.length ? photos : [],       // jsonb — NOT JSON.stringify
+      photos:          photos.length ? photos : [],       // jsonb   NOT JSON.stringify
       photo_url:       photos.length ? photos[0] : null, // legacy single photo_url column
       status:          'pending',
       submitted_at:    now
     };
 
-    // ── INSERT site_reports ──────────────────────────────────────
+    //    INSERT site_reports                                       
     var r1 = await fetch(SB_URL + '/rest/v1/site_reports', {
       method:  'POST',
       headers: { ...SB_H, Prefer: 'return=representation' },
@@ -502,7 +560,7 @@ async function submitReport() {
     var saved = await r1.json();
     var savedId = saved[0] && saved[0].id ? saved[0].id : null;
 
-    // ── UPDATE site_pulse_requests → submitted ───────────────────
+    //    UPDATE site_pulse_requests   submitted                    
     if (requestData) {
       await fetch(SB_URL + '/rest/v1/site_pulse_requests?id=eq.' + requestData.id, {
         method:  'PATCH',
@@ -511,7 +569,7 @@ async function submitReport() {
       });
     }
 
-    // ── Success ──────────────────────────────────────────────────
+    //    Success                                                   
     var projectName = requestData ? requestData.project_name : 'הפרויקט';
     showSuccess(
       'הדוח נשלח בהצלחה!',
@@ -527,9 +585,9 @@ async function submitReport() {
   }
 }
 
-// ── UTILS ─────────────────────────────────────────────────────────
+//    UTILS                                                          
 function formatDate(iso) {
-  if (!iso) return '—';
+  if (!iso) return '--';
   var d = new Date(iso);
   if (isNaN(d)) return iso;
   return d.toLocaleDateString('he-IL', {weekday:'short', day:'numeric', month:'numeric', year:'numeric'});
