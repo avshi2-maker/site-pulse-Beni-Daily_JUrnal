@@ -2,599 +2,545 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#1a1a2e">
-<title>דוח יומי — Site Pulse</title>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#1a3d5c">
+<title>Site Pulse — דוח יומי</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
-:root {
-  --bg:      #f4f1eb;
-  --surface: #ffffff;
-  --border:  #e0d8c8;
-  --ink:     #1a1610;
-  --ink2:    #5a5040;
-  --ink3:    #a09070;
-  --orange:  #e8770a;
-  --orange2: #c45f00;
-  --green:   #1a7a3a;
-  --red:     #c0392b;
-  --gold:    #c9a84c;
-  --r:       14px;
-  --shadow:  0 2px 16px rgba(0,0,0,0.08);
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{font-size:16px;}
-body{
-  font-family:'Heebo',sans-serif;
-  background:var(--bg);
-  color:var(--ink);
-  min-height:100vh;
-  direction:rtl;
-  -webkit-font-smoothing:antialiased;
-}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif;background:#f0f4f8;color:#1a1a2e;min-height:100vh;direction:rtl;}
 
-/* ── HEADER ── */
-.hdr{
-  background:linear-gradient(135deg,#1a1610,#2d2318);
-  color:white;
-  padding:20px 20px 16px;
-  text-align:center;
-}
-.hdr-logo{font-size:32px;margin-bottom:6px;}
-.hdr-title{font-size:20px;font-weight:900;color:#f5c842;letter-spacing:-0.5px;}
-.hdr-sub{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px;}
-.hdr-meta{
-  display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap;
-}
-.hdr-chip{
-  background:rgba(255,255,255,0.1);
-  border:1px solid rgba(255,255,255,0.15);
-  color:rgba(255,255,255,0.85);
-  border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;
-}
+/* ── Header ─────────────────────────────────────────────────────── */
+.header{background:linear-gradient(135deg,#1a3d5c,#2d6a9f);color:white;padding:16px 16px 12px;}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.header-title{font-size:20px;font-weight:900;}
+.header-sub{font-size:11px;opacity:0.75;}
+.report-meta{background:rgba(255,255,255,0.12);border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.meta-item{display:flex;flex-direction:column;gap:2px;}
+.meta-label{font-size:10px;opacity:0.7;font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+.meta-val{font-size:13px;font-weight:800;}
+.report-num{font-size:18px;font-weight:900;color:#ffd700;}
 
-/* ── SCREENS ── */
-.screen{display:none;padding:20px;max-width:520px;margin:0 auto;}
-.screen.active{display:block;}
-
-/* ── ERROR / LOADING ── */
-.center-screen{
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  min-height:60vh;gap:16px;padding:32px;text-align:center;
-}
-.spin{width:40px;height:40px;border:4px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.err-icon{font-size:48px;}
-.err-msg{font-size:14px;color:var(--ink2);line-height:1.6;max-width:300px;}
-
-/* ── CARD ── */
-.card{
-  background:var(--surface);
-  border-radius:var(--r);
-  padding:18px;
-  margin-bottom:16px;
-  box-shadow:var(--shadow);
-  border:1px solid var(--border);
-}
-.card-title{
-  font-size:13px;font-weight:800;
-  color:var(--orange);
-  text-transform:uppercase;letter-spacing:0.8px;
-  margin-bottom:14px;
-  display:flex;align-items:center;gap:8px;
-}
-
-/* ── FORM FIELDS ── */
+/* ── Cards ───────────────────────────────────────────────────────── */
+.card{background:white;border-radius:14px;padding:16px;margin:10px 12px 0;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+.card-title{font-size:11px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
 .field{margin-bottom:14px;}
-.field label{
-  font-size:12px;font-weight:700;
-  color:var(--ink2);display:block;margin-bottom:6px;
-}
-.inp{
-  width:100%;
-  border:2px solid var(--border);border-radius:10px;
-  padding:13px 14px;font-size:15px;
-  font-family:'Heebo',sans-serif;color:var(--ink);
-  background:var(--bg);
-  transition:border-color 0.18s;direction:rtl;
-  -webkit-appearance:none;
-}
-.inp:focus{outline:none;border-color:var(--orange);}
-.inp::placeholder{color:var(--ink3);}
-textarea.inp{resize:none;height:90px;line-height:1.5;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12px;font-weight:700;color:#555;margin-bottom:5px;}
+.req{color:#e53e3e;margin-right:2px;}
 
-/* ── TASK CHECKBOXES ── */
-.task-list{display:flex;flex-direction:column;gap:10px;}
-.task-item{
-  display:flex;align-items:center;gap:12px;
-  padding:13px 14px;
-  background:var(--bg);
-  border:2px solid var(--border);
-  border-radius:10px;cursor:pointer;
-  transition:all 0.18s;touch-action:manipulation;
-  user-select:none;
-}
-.task-item.checked{
-  background:#f0fff4;
-  border-color:var(--green);
-}
-.task-box{
-  width:26px;height:26px;border-radius:7px;
-  border:2.5px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;font-size:15px;
-  transition:all 0.18s;background:white;
-}
-.task-item.checked .task-box{
-  background:var(--green);border-color:var(--green);color:white;
-}
-.task-label{font-size:14px;font-weight:600;flex:1;}
+/* ── Inputs ──────────────────────────────────────────────────────── */
+.inp{width:100%;padding:11px 12px;border:1.5px solid #dde1e7;border-radius:9px;font-family:'Heebo',sans-serif;font-size:14px;color:#1a1a2e;background:#fafafa;direction:rtl;transition:border-color .15s;}
+.inp:focus{outline:none;border-color:#2d6a9f;background:white;}
+textarea.inp{resize:none;line-height:1.6;}
 
-/* ── STARS ── */
-.stars{display:flex;gap:10px;justify-content:center;padding:10px 0;}
-.star{
-  font-size:42px;cursor:pointer;
-  transition:transform 0.15s;
-  filter:grayscale(1);opacity:0.3;
-  touch-action:manipulation;
-}
-.star.active{filter:none;opacity:1;transform:scale(1.1);}
+/* ── Voice input row ─────────────────────────────────────────────── */
+.voice-row{display:flex;gap:8px;align-items:flex-start;}
+.voice-row .inp{flex:1;}
+.voice-btn{width:44px;height:44px;border-radius:10px;border:1.5px solid #dde1e7;background:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.voice-btn.recording{background:#ef4444;border-color:#ef4444;animation:vpulse .8s ease-in-out infinite;}
+.voice-btn.disabled{opacity:.4;cursor:not-allowed;}
+@keyframes vpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.voice-hint{font-size:10px;color:#aaa;margin-top:3px;text-align:center;}
 
-/* ── WORKERS ── */
-.workers-row{display:flex;gap:10px;align-items:center;}
-.workers-count{
-  width:80px;flex-shrink:0;
-  border:2px solid var(--border);border-radius:10px;
-  padding:13px;font-size:22px;font-weight:900;
-  font-family:'Heebo',sans-serif;color:var(--ink);
-  background:var(--bg);text-align:center;
-  -webkit-appearance:none;
-}
-.workers-count:focus{outline:none;border-color:var(--orange);}
+/* ── Weather ─────────────────────────────────────────────────────── */
+.weather-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.weather-btn{padding:10px 6px;border:2px solid #dde1e7;border-radius:9px;background:#fafafa;font-family:'Heebo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;text-align:center;color:#555;transition:all .15s;}
+.weather-btn.active{border-color:#2d6a9f;background:rgba(45,106,159,.08);color:#2d6a9f;}
 
-/* ── BIG SEND BUTTON ── */
-.send-btn{
-  width:100%;padding:18px;
-  background:linear-gradient(135deg,var(--orange),var(--orange2));
-  color:white;border:none;border-radius:var(--r);
-  font-family:'Heebo',sans-serif;
-  font-size:18px;font-weight:900;
-  cursor:pointer;letter-spacing:0.3px;
-  box-shadow:0 6px 20px rgba(232,119,10,0.35);
-  transition:all 0.18s;touch-action:manipulation;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-}
-.send-btn:active{transform:scale(0.97);}
-.send-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+/* ── Workers counter ─────────────────────────────────────────────── */
+.counter{display:flex;align-items:center;gap:12px;}
+.counter-btn{width:44px;height:44px;border-radius:50%;border:2px solid #dde1e7;background:white;font-size:22px;font-weight:700;cursor:pointer;color:#2d6a9f;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.counter-btn:active{background:#e8f0fb;}
+.counter-val{font-size:28px;font-weight:900;color:#1a3d5c;min-width:40px;text-align:center;}
 
-/* ── SUCCESS SCREEN ── */
-.success-wrap{
-  text-align:center;padding:48px 24px;
-}
-.success-icon{font-size:72px;margin-bottom:20px;animation:pop 0.4s ease;}
-@keyframes pop{from{transform:scale(0.5)}to{transform:scale(1)}}
-.success-title{font-size:24px;font-weight:900;margin-bottom:10px;color:var(--green);}
-.success-sub{font-size:14px;color:var(--ink2);line-height:1.6;}
-.success-summary{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:16px;margin:20px 0;
-  text-align:right;font-size:13px;line-height:1.8;
-  color:var(--ink2);
-}
+/* ── Stars ───────────────────────────────────────────────────────── */
+.stars{display:flex;gap:8px;}
+.star{font-size:28px;cursor:pointer;opacity:.3;transition:opacity .12s;}
+.star.active{opacity:1;}
 
-/* ── PHOTO UPLOAD ── */
-.photo-btn{
-  width:100%;padding:14px;
-  background:var(--bg);border:2px dashed var(--border);
-  border-radius:10px;color:var(--ink2);
-  font-family:'Heebo',sans-serif;font-size:14px;font-weight:700;
-  cursor:pointer;display:flex;align-items:center;
-  justify-content:center;gap:8px;touch-action:manipulation;
-  transition:border-color 0.18s;
-}
-.photo-btn:hover{border-color:var(--orange);}
-.photo-preview{
-  width:100%;border-radius:10px;margin-top:10px;
-  display:none;max-height:200px;object-fit:cover;
-}
+/* ── Photos ──────────────────────────────────────────────────────── */
+.photo-area{border:2px dashed #dde1e7;border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:#888;font-size:13px;font-weight:700;}
+.photo-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.photo-thumb{width:72px;height:72px;border-radius:8px;object-fit:cover;border:1.5px solid #dde1e7;}
 
-/* ── PROGRESS ── */
-.progress-dots{
-  display:flex;justify-content:center;gap:8px;padding:16px 0 8px;
-}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all 0.3s;}
-.dot.active{background:var(--orange);width:24px;border-radius:4px;}
-.dot.done{background:var(--green);}
+/* ── Info rows ───────────────────────────────────────────────────── */
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:rgba(45,106,159,.06);border-radius:8px;margin-bottom:6px;font-size:13px;}
+.info-label{color:#888;font-weight:600;font-size:11px;}
+.info-val{font-weight:800;color:#1a3d5c;}
+
+/* ── Submit ──────────────────────────────────────────────────────── */
+.submit-btn{display:block;width:calc(100% - 24px);margin:16px 12px 32px;padding:18px;background:linear-gradient(135deg,#25d366,#128c7e);color:white;border:none;border-radius:14px;font-family:'Heebo',sans-serif;font-size:17px;font-weight:900;cursor:pointer;box-shadow:0 4px 14px rgba(37,211,102,.3);}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ── Screens ─────────────────────────────────────────────────────── */
+#loading-screen{position:fixed;inset:0;background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;}
+.spinner{width:44px;height:44px;border:4px solid #dde1e7;border-top-color:#2d6a9f;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+#success-screen{display:none;position:fixed;inset:0;background:white;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;}
+.success-icon{font-size:72px;margin-bottom:20px;}
+.success-title{font-size:24px;font-weight:900;color:#128c7e;margin-bottom:10px;}
+.success-ref{font-size:13px;color:#888;margin-top:12px;background:#f4f4f4;padding:8px 16px;border-radius:8px;font-weight:700;}
+.success-sub{font-size:15px;color:#666;line-height:1.6;}
+#error-screen{display:none;position:fixed;inset:0;background:white;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;}
+.error-icon{font-size:60px;margin-bottom:16px;}
+.error-title{font-size:20px;font-weight:900;color:#e53e3e;margin-bottom:10px;}
+.error-sub{font-size:14px;color:#888;margin-bottom:20px;}
+.retry-btn{padding:12px 28px;background:#2d6a9f;color:white;border:none;border-radius:10px;font-family:'Heebo',sans-serif;font-size:14px;font-weight:800;cursor:pointer;}
+
+/* ── Toast ───────────────────────────────────────────────────────── */
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);color:white;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;opacity:0;transition:opacity .3s;z-index:9999;white-space:nowrap;pointer-events:none;}
+#toast.show{opacity:1;}
 </style>
 </head>
 <body>
 
-<div class="hdr">
-  <div class="hdr-logo">🏗️</div>
-  <div class="hdr-title">דוח יומי — Site Pulse</div>
-  <div class="hdr-sub">מלא את הדוח בסיום יום העבודה</div>
-  <div class="hdr-meta">
-    <span class="hdr-chip" id="chip-name">טוען...</span>
-    <span class="hdr-chip" id="chip-date"></span>
-  </div>
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <div style="font-size:14px;color:#888;font-weight:700;">טוען טופס...</div>
 </div>
 
-<!-- LOADING -->
-<div class="screen active" id="screen-loading">
-  <div class="center-screen">
-    <div class="spin"></div>
-    <div style="color:var(--ink2);font-size:14px;font-weight:600;">טוען נתונים...</div>
-  </div>
+<div id="success-screen">
+  <div class="success-icon">✅</div>
+  <div class="success-title" id="success-title">הדוח נשלח בהצלחה!</div>
+  <div class="success-sub" id="success-detail">תודה. הדוח התקבל ויעובד על ידי בני פרסקי.</div>
+  <div class="success-ref" id="success-ref" style="display:none;"></div>
 </div>
 
-<!-- ERROR -->
-<div class="screen" id="screen-error">
-  <div class="center-screen">
-    <div class="err-icon">⚠️</div>
-    <div style="font-size:18px;font-weight:800;color:var(--red);">קישור לא תקין</div>
-    <div class="err-msg" id="err-msg">לא נמצא קבלן. בקש מבני לשלוח לך את הקישור הנכון.</div>
-  </div>
+<div id="error-screen">
+  <div class="error-icon">⚠️</div>
+  <div class="error-title" id="error-title">שגיאה בטעינת הטופס</div>
+  <div class="error-sub" id="error-detail">נסה שוב או פנה לבני פרסקי.</div>
+  <button class="retry-btn" onclick="location.reload()">נסה שוב</button>
 </div>
 
-<!-- FORM -->
-<div class="screen" id="screen-form">
-  <div class="progress-dots">
-    <div class="dot active" id="dot-1"></div>
-    <div class="dot" id="dot-2"></div>
-    <div class="dot" id="dot-3"></div>
-    <div class="dot" id="dot-4"></div>
-  </div>
+<div id="main-form" style="display:none;">
 
-  <!-- STEP 1: TASKS -->
-  <div id="step-1">
-    <div class="card">
-      <div class="card-title">✅ מה בוצע היום?</div>
-      <div class="task-list" id="task-list">
-        <div style="color:var(--ink3);font-size:13px;text-align:center;padding:16px;">טוען משימות...</div>
+  <!-- ── HEADER with report meta ────────────────────────────────── -->
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-title">🏗️ Site Pulse</div>
+        <div class="header-sub">דוח עבודה יומי — בני פרסקי בניה</div>
       </div>
-      <div class="field" style="margin-top:14px;margin-bottom:0;">
-        <label>משימה נוספת שלא ברשימה</label>
-        <input class="inp" id="extra-task" placeholder="הוסף משימה ידנית..." type="text">
-      </div>
+      <div class="report-num" id="header-report-num">#---</div>
     </div>
-    <button class="send-btn" onclick="goStep(2)" style="background:linear-gradient(135deg,#2d5a8e,#1e3a5f);">
-      המשך ← עובדים
-    </button>
-  </div>
-
-  <!-- STEP 2: WORKERS -->
-  <div id="step-2" style="display:none;">
-    <div class="card">
-      <div class="card-title">👷 מי היה באתר?</div>
-      <div class="field">
-        <label>מספר עובדים</label>
-        <div class="workers-row">
-          <input class="workers-count" id="workers-count" type="number" min="0" max="99" value="0">
-          <span style="font-size:14px;color:var(--ink2);font-weight:600;">עובדים באתר היום</span>
-        </div>
+    <div class="report-meta">
+      <div class="meta-item">
+        <span class="meta-label">קבלן</span>
+        <span class="meta-val" id="meta-contractor">—</span>
       </div>
-      <div class="field" style="margin-bottom:0;">
-        <label>שמות העובדים (אופציונלי)</label>
-        <textarea class="inp" id="workers-names" placeholder="ישראל ישראלי, משה כהן..."></textarea>
+      <div class="meta-item">
+        <span class="meta-label">פרויקט</span>
+        <span class="meta-val" id="meta-project">—</span>
       </div>
-    </div>
-    <div style="display:flex;gap:10px;">
-      <button class="send-btn" onclick="goStep(1)" style="background:var(--ink2);flex:0 0 80px;font-size:14px;">← חזור</button>
-      <button class="send-btn" onclick="goStep(3)" style="flex:1;background:linear-gradient(135deg,#2d5a8e,#1e3a5f);">המשך ← בעיות</button>
+      <div class="meta-item">
+        <span class="meta-label">תאריך</span>
+        <span class="meta-val" id="meta-date">—</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">שעת שליחה</span>
+        <span class="meta-val" id="meta-time">—</span>
+      </div>
     </div>
   </div>
 
-  <!-- STEP 3: ISSUES + PHOTO -->
-  <div id="step-3" style="display:none;">
-    <div class="card">
-      <div class="card-title">🔴 בעיות ותקלות</div>
-      <div class="field">
-        <label>תאר בעיות שהתגלו (אם אין — השאר ריק)</label>
-        <textarea class="inp" id="issues-text" placeholder="לדוגמה: חוסר בחומר בטון, עיכוב בגלל גשם, בעיה עם ציוד..."></textarea>
+  <!-- ── Who is filling ─────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">פרטי הממלא</div>
+    <div class="field">
+      <label>שם מלא <span class="req">*</span></label>
+      <div class="voice-row">
+        <input class="inp" id="f-submitted-by" type="text" placeholder="שם הממלא">
+        <button class="voice-btn" id="vbtn-submitted-by" onclick="toggleVoice('f-submitted-by','vbtn-submitted-by')" title="דיקטוף קולי">🎙️</button>
       </div>
-      <div class="field" style="margin-bottom:0;">
-        <label>צרף תמונה מהאתר (אופציונלי)</label>
-        <button class="photo-btn" onclick="document.getElementById('photo-input').click()">
-          📷 צלם / בחר תמונה
-        </button>
-        <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" onchange="previewPhoto(this)">
-        <img id="photo-preview" class="photo-preview">
-      </div>
-    </div>
-    <div style="display:flex;gap:10px;">
-      <button class="send-btn" onclick="goStep(2)" style="background:var(--ink2);flex:0 0 80px;font-size:14px;">← חזור</button>
-      <button class="send-btn" onclick="goStep(4)" style="flex:1;background:linear-gradient(135deg,#2d5a8e,#1e3a5f);">המשך ← דירוג</button>
     </div>
   </div>
 
-  <!-- STEP 4: RATING + SUBMIT -->
-  <div id="step-4" style="display:none;">
-    <div class="card">
-      <div class="card-title">⭐ איך היה היום?</div>
-      <div class="stars" id="stars">
-        <span class="star" onclick="setRating(1)" data-r="1">⭐</span>
-        <span class="star" onclick="setRating(2)" data-r="2">⭐</span>
-        <span class="star" onclick="setRating(3)" data-r="3">⭐</span>
-        <span class="star" onclick="setRating(4)" data-r="4">⭐</span>
-        <span class="star" onclick="setRating(5)" data-r="5">⭐</span>
-      </div>
-      <div style="text-align:center;font-size:13px;color:var(--ink3);margin-top:4px;" id="rating-label">לחץ על כוכב לדירוג</div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">📋 סיכום לפני שליחה</div>
-      <div id="summary-preview" style="font-size:13px;line-height:1.9;color:var(--ink2);"></div>
-    </div>
-
-    <div style="display:flex;gap:10px;margin-bottom:10px;">
-      <button class="send-btn" onclick="goStep(3)" style="background:var(--ink2);flex:0 0 80px;font-size:14px;">← חזור</button>
-      <button class="send-btn" onclick="submitReport()" id="submit-btn" style="flex:1;">
-        📤 שלח דוח לבני
-      </button>
+  <!-- ── Weather ────────────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">מזג אוויר</div>
+    <div class="weather-grid">
+      <button class="weather-btn" data-val="שמשי"  onclick="setWeather(this)">☀️<br>שמשי</button>
+      <button class="weather-btn" data-val="מעונן"  onclick="setWeather(this)">⛅<br>מעונן</button>
+      <button class="weather-btn" data-val="גשום"   onclick="setWeather(this)">🌧️<br>גשום</button>
+      <button class="weather-btn" data-val="סופה"   onclick="setWeather(this)">🌩️<br>סופה</button>
+      <button class="weather-btn" data-val="שרב"    onclick="setWeather(this)">🌵<br>שרב</button>
+      <button class="weather-btn" data-val="קר"     onclick="setWeather(this)">❄️<br>קר</button>
     </div>
   </div>
+
+  <!-- ── Workers ────────────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">פועלים באתר <span class="req">*</span></div>
+    <div class="counter">
+      <button class="counter-btn" onclick="changeWorkers(-1)">−</button>
+      <div class="counter-val" id="workers-val">0</div>
+      <button class="counter-btn" onclick="changeWorkers(1)">+</button>
+      <div style="font-size:13px;color:#888;margin-right:4px;">פועלים</div>
+    </div>
+  </div>
+
+  <!-- ── Activities ─────────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">עבודות שבוצעו <span class="req">*</span></div>
+    <div class="field">
+      <div class="voice-row">
+        <textarea class="inp" id="f-activities" rows="4" placeholder="תאר את העבודות שבוצעו היום באתר..."></textarea>
+        <button class="voice-btn" id="vbtn-activities" onclick="toggleVoice('f-activities','vbtn-activities')" title="דיקטוף קולי">🎙️</button>
+      </div>
+      <div class="voice-hint" id="vhint-activities"></div>
+    </div>
+  </div>
+
+  <!-- ── Tools ──────────────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">ציוד וכלי עבודה</div>
+    <div class="field">
+      <div class="voice-row">
+        <textarea class="inp" id="f-tools" rows="3" placeholder="ציוד, מכשירים, רכבים ששימשו היום..."></textarea>
+        <button class="voice-btn" id="vbtn-tools" onclick="toggleVoice('f-tools','vbtn-tools')" title="דיקטוף קולי">🎙️</button>
+      </div>
+      <div class="voice-hint" id="vhint-tools"></div>
+    </div>
+  </div>
+
+  <!-- ── Issues ─────────────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">בעיות / חריגות</div>
+    <div class="field">
+      <div class="voice-row">
+        <textarea class="inp" id="f-issues" rows="3" placeholder="בעיות שנתגלו, עיכובים, חומרים חסרים..."></textarea>
+        <button class="voice-btn" id="vbtn-issues" onclick="toggleVoice('f-issues','vbtn-issues')" title="דיקטוף קולי">🎙️</button>
+      </div>
+      <div class="voice-hint" id="vhint-issues"></div>
+    </div>
+  </div>
+
+  <!-- ── Remarks ────────────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">הערות נוספות</div>
+    <div class="field">
+      <div class="voice-row">
+        <textarea class="inp" id="f-remarks" rows="3" placeholder="כל מה שצריך לדעת..."></textarea>
+        <button class="voice-btn" id="vbtn-remarks" onclick="toggleVoice('f-remarks','vbtn-remarks')" title="דיקטוף קולי">🎙️</button>
+      </div>
+      <div class="voice-hint" id="vhint-remarks"></div>
+    </div>
+  </div>
+
+  <!-- ── Rating ─────────────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">דירוג היום</div>
+    <div class="stars" id="stars-row">
+      <span class="star" data-v="1" onclick="setRating(1)">⭐</span>
+      <span class="star" data-v="2" onclick="setRating(2)">⭐</span>
+      <span class="star" data-v="3" onclick="setRating(3)">⭐</span>
+      <span class="star" data-v="4" onclick="setRating(4)">⭐</span>
+      <span class="star" data-v="5" onclick="setRating(5)">⭐</span>
+    </div>
+  </div>
+
+  <!-- ── Photos ─────────────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">תמונות מהאתר</div>
+    <label class="photo-area" for="photo-input">
+      📷 צלם תמונה או בחר מהגלריה
+      <input type="file" id="photo-input" accept="image/*" multiple capture="environment"
+             style="display:none;" onchange="handlePhotos(this)">
+    </label>
+    <div class="photo-previews" id="photo-previews"></div>
+  </div>
+
+  <button class="submit-btn" id="submit-btn" onclick="submitReport()">✅ שלח דוח</button>
 </div>
 
-<!-- SUCCESS -->
-<div class="screen" id="screen-success">
-  <div class="success-wrap">
-    <div class="success-icon">✅</div>
-    <div class="success-title">הדוח נשלח!</div>
-    <div class="success-sub">בני קיבל את הדוח שלך לוואטסאפ.<br>תודה על העבודה היום!</div>
-    <div class="success-summary" id="success-summary"></div>
-    <button class="send-btn" onclick="location.reload()" style="margin-top:8px;">
-      📋 שלח דוח נוסף
-    </button>
-  </div>
-</div>
+<div id="toast"></div>
 
 <script>
+// ── SUPABASE ──────────────────────────────────────────────────────
 const SB_URL = 'https://vmcipofovheztbjmhwsl.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtY2lwb2ZvdmhlenRiam1od3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjE2MTcsImV4cCI6MjA4NzAzNzYxN30.LPq5N2Xo8iEqjgz2UhmdzUdh5tpGT3EYzSxJcYBEJ1w';
+const SB_H   = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
 
-// Beni's WhatsApp number — update with real number
-const BENI_PHONE = `972521234567`;
+// ── STATE ─────────────────────────────────────────────────────────
+var requestData = null;
+var workers     = 0;
+var weather     = '';
+var rating      = 0;
+var photos      = [];
+var reportNum   = null;  // unique report number for tracking
 
-let contractorId   = null;
-let contractorName = '';
-let projectId      = null;
-let projectName    = '';
-let currentRating  = 0;
-let checkedTasks   = new Set();
-let allTasks       = [];
+// ── INIT ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', initForm);
 
-// ── INIT ─────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async () => {
-  // Set date chip
-  const today = new Date();
-  document.getElementById('chip-date').textContent =
-    today.toLocaleDateString('he-IL', {weekday:'long', day:'numeric', month:'long'});
+async function initForm() {
+  // Live clock in header
+  setInterval(function() {
+    var el = document.getElementById('meta-time');
+    if (el) el.textContent = new Date().toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
+  }, 1000);
+  document.getElementById('meta-time').textContent =
+    new Date().toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
 
-  // Parse URL params
-  const params  = new URLSearchParams(window.location.search);
-  contractorId  = params.get('c');
-  projectId     = params.get('p');
+  var params = new URLSearchParams(window.location.search);
+  var reqId  = params.get('req');
 
-  if (!contractorId) {
-    showError('לא נמצא מזהה קבלן בקישור. בקש מבני לשלוח לך את הקישור הנכון.');
-    return;
-  }
-
-  try {
-    // Load contractor name
-    const cRes = await fetch(
-      SB_URL + '/rest/v1/contractors?id=eq.' + contractorId + '&select=id,name,phone',
-      { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } }
-    );
-    const contractors = await cRes.json();
-    if (!contractors || contractors.length === 0) {
-      showError('קבלן לא נמצא במערכת. בקש מבני לשלוח את הקישור הנכון.');
+  if (reqId) {
+    try {
+      var res  = await fetch(SB_URL + '/rest/v1/site_pulse_requests?id=eq.' + reqId + '&select=*',
+        { headers: SB_H });
+      var rows = await res.json();
+      if (!rows || !rows.length) {
+        showError('קישור לא תקין', 'הבקשה לא נמצאה. ייתכן שפג תוקפה.');
+        return;
+      }
+      requestData = rows[0];
+      if (requestData.status === 'submitted') {
+        showSuccess('הדוח כבר נשלח', 'הדוח עבור ' + requestData.project_name + ' כבר הוגש בהצלחה.', null);
+        return;
+      }
+      // Generate unique report number: SP-YYYYMMDD-XXXX
+      reportNum = 'SP-' + requestData.report_date.replace(/-/g,'') + '-' + reqId.slice(0,4).toUpperCase();
+      fillHeader(requestData);
+    } catch(e) {
+      showError('שגיאת תקשורת', 'לא ניתן לטעון את הטופס. בדוק חיבור אינטרנט.');
       return;
     }
-    contractorName = contractors[0].name;
-    document.getElementById('chip-name').textContent = '👷 ' + contractorName;
-
-    // Load project if param exists
-    if (projectId) {
-      const pRes = await fetch(
-        SB_URL + '/rest/v1/projects?id=eq.' + projectId + '&select=id,name',
-        { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } }
-      );
-      const projects = await pRes.json();
-      if (projects && projects.length > 0) projectName = projects[0].name;
-    }
-
-    // Load task templates
-    let taskUrl = SB_URL + '/rest/v1/report_tasks?is_active=eq.true&order=sort_order';
-    if (projectId) taskUrl += '&or=(project_id.eq.' + projectId + ',project_id.is.null)';
-    const tRes = await fetch(taskUrl, { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
-    allTasks = await tRes.json();
-    renderTasks(allTasks);
-
-    showScreen('form');
-  } catch(e) {
-    showError('שגיאת חיבור: ' + e.message);
+  } else {
+    // Self-initiated
+    var today = new Date().toISOString().slice(0,10);
+    reportNum = 'SP-' + today.replace(/-/g,'') + '-SELF';
+    fillHeader(null);
   }
-});
 
-// ── RENDER TASKS ──────────────────────────────────────────
-function renderTasks(tasks) {
-  const list = document.getElementById('task-list');
-  if (!tasks || tasks.length === 0) {
-    list.innerHTML = '<div style="color:var(--ink3);font-size:13px;text-align:center;padding:12px;">אין משימות — הוסף ידנית למטה</div>';
+  hideLoading();
+}
+
+function fillHeader(data) {
+  document.getElementById('meta-contractor').textContent = data ? data.contractor_name : 'עצמאי';
+  document.getElementById('meta-project').textContent    = data ? data.project_name    : '—';
+  document.getElementById('meta-date').textContent       = data
+    ? formatDate(data.report_date)
+    : formatDate(new Date().toISOString().slice(0,10));
+  document.getElementById('header-report-num').textContent = '#' + (reportNum || '---');
+  if (data) document.getElementById('f-submitted-by').value = data.contractor_name || '';
+}
+
+function hideLoading() {
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('main-form').style.display = 'block';
+}
+function showError(title, detail) {
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('error-title').textContent  = title;
+  document.getElementById('error-detail').textContent = detail;
+  document.getElementById('error-screen').style.display = 'flex';
+}
+function showSuccess(title, detail, ref) {
+  document.getElementById('loading-screen').style.display  = 'none';
+  document.getElementById('main-form').style.display       = 'none';
+  document.getElementById('success-screen').style.display  = 'flex';
+  document.getElementById('success-title').textContent  = title;
+  document.getElementById('success-detail').textContent = detail;
+  var refEl = document.getElementById('success-ref');
+  if (ref) { refEl.textContent = '📋 מספר דוח: ' + ref; refEl.style.display = 'block'; }
+  else { refEl.style.display = 'none'; }
+}
+
+// ── FORM CONTROLS ─────────────────────────────────────────────────
+function setWeather(btn) {
+  document.querySelectorAll('.weather-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  weather = btn.dataset.val;
+}
+function changeWorkers(d) {
+  workers = Math.max(0, workers + d);
+  document.getElementById('workers-val').textContent = workers;
+}
+function setRating(val) {
+  rating = val;
+  document.querySelectorAll('.star').forEach(s => s.classList.toggle('active', parseInt(s.dataset.v) <= val));
+}
+function handlePhotos(input) {
+  var previews = document.getElementById('photo-previews');
+  Array.from(input.files).forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      photos.push(e.target.result);
+      var img = document.createElement('img');
+      img.className = 'photo-thumb';
+      img.src = e.target.result;
+      previews.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── VOICE INPUT ───────────────────────────────────────────────────
+var _voiceActive = null;
+var _recognition = null;
+
+function toggleVoice(fieldId, btnId) {
+  // Check browser support
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('דיקטוף לא נתמך בדפדפן זה'); return; }
+
+  var btn   = document.getElementById(btnId);
+  var field = document.getElementById(fieldId);
+  var hint  = document.getElementById('vhint-' + fieldId.replace('f-',''));
+
+  // If already recording this field — stop
+  if (_voiceActive === fieldId) {
+    if (_recognition) _recognition.stop();
     return;
   }
-  list.innerHTML = tasks.map(t => `
-    <div class="task-item" id="task-${t.id}" onclick="toggleTask('${t.id}','${esc(t.task_text)}')">
-      <div class="task-box" id="box-${t.id}"></div>
-      <div class="task-label">${esc(t.task_text)}</div>
-    </div>`).join('');
-}
 
-function toggleTask(id, label) {
-  const item = document.getElementById('task-' + id);
-  const box  = document.getElementById('box-' + id);
-  if (checkedTasks.has(id)) {
-    checkedTasks.delete(id);
-    item.classList.remove('checked');
-    box.textContent = '';
-  } else {
-    checkedTasks.add(id);
-    item.classList.add('checked');
-    box.textContent = '✓';
-  }
-}
+  // Stop any other active recording
+  if (_recognition) _recognition.stop();
 
-// ── STEPS ────────────────────────────────────────────────
-function goStep(n) {
-  [1,2,3,4].forEach(i => {
-    document.getElementById('step-' + i).style.display = i === n ? 'block' : 'none';
-    const dot = document.getElementById('dot-' + i);
-    dot.className = 'dot' + (i < n ? ' done' : i === n ? ' active' : '');
-  });
-  if (n === 4) buildSummary();
-  window.scrollTo({top: 0, behavior:'smooth'});
-}
+  _voiceActive = fieldId;
+  btn.classList.add('recording');
+  if (hint) hint.textContent = '🔴 מקשיב...';
 
-// ── STARS ────────────────────────────────────────────────
-function setRating(r) {
-  currentRating = r;
-  document.querySelectorAll('.star').forEach(s => {
-    s.classList.toggle('active', parseInt(s.dataset.r) <= r);
-  });
-  const labels = ['','יום גרוע 😞','יום בינוני 😐','יום סביר 🙂','יום טוב 😊','יום מצוין! 🌟'];
-  document.getElementById('rating-label').textContent = labels[r];
-}
+  _recognition = new SR();
+  _recognition.lang = 'he-IL';
+  _recognition.continuous = true;
+  _recognition.interimResults = true;
 
-// ── PHOTO PREVIEW ─────────────────────────────────────────
-function previewPhoto(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = document.getElementById('photo-preview');
-    img.src = e.target.result;
-    img.style.display = 'block';
-    document.querySelector('.photo-btn').textContent = '✅ תמונה נבחרה — לחץ להחלפה';
+  var base = field.value;  // keep existing text
+
+  _recognition.onresult = function(e) {
+    var interim = '';
+    var final   = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final   += e.results[i][0].transcript;
+      else                       interim += e.results[i][0].transcript;
+    }
+    field.value = base + final;
+    if (interim && hint) hint.textContent = '💬 ' + interim;
+    if (final) base = field.value;
   };
-  reader.readAsDataURL(file);
+
+  _recognition.onerror = function(e) {
+    toast('שגיאת קול: ' + e.error);
+    stopVoice(btn, hint);
+  };
+
+  _recognition.onend = function() {
+    stopVoice(btn, hint);
+  };
+
+  _recognition.start();
 }
 
-// ── BUILD SUMMARY ─────────────────────────────────────────
-function buildSummary() {
-  const done   = [...checkedTasks].map(id => {
-    const t = allTasks.find(x => x.id === id);
-    return t ? t.task_text : '';
-  }).filter(Boolean);
-  const extra  = document.getElementById('extra-task').value.trim();
-  const all    = extra ? [...done, extra] : done;
-  const issues = document.getElementById('issues-text').value.trim();
-  const wCount = document.getElementById('workers-count').value || '0';
-  const wNames = document.getElementById('workers-names').value.trim();
-
-  document.getElementById('summary-preview').innerHTML =
-    '<b>קבלן:</b> ' + contractorName + '<br>' +
-    (projectName ? '<b>פרויקט:</b> ' + projectName + '<br>' : '') +
-    '<b>משימות שבוצעו:</b> ' + (all.length > 0 ? all.join('، ') : 'לא נבחרו') + '<br>' +
-    '<b>עובדים:</b> ' + wCount + (wNames ? ' (' + wNames + ')' : '') + '<br>' +
-    (issues ? '<b>בעיות:</b> ' + issues + '<br>' : '') +
-    '<b>דירוג יום:</b> ' + (currentRating > 0 ? '⭐'.repeat(currentRating) : 'לא דורג');
+function stopVoice(btn, hint) {
+  _voiceActive = null;
+  _recognition = null;
+  if (btn)  btn.classList.remove('recording');
+  if (hint) hint.textContent = '';
 }
 
-// ── SUBMIT ────────────────────────────────────────────────
+// ── SUBMIT ────────────────────────────────────────────────────────
 async function submitReport() {
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
+  var submittedBy = document.getElementById('f-submitted-by').value.trim();
+  var activities  = document.getElementById('f-activities').value.trim();
+  if (!submittedBy) { toast('⚠️ חסר שם הממלא'); return; }
+  if (!activities)  { toast('⚠️ חסר תיאור עבודות'); return; }
+  if (workers === 0){ toast('⚠️ יש לציין מספר פועלים'); return; }
+
+  // Stop any active voice recording before submit
+  if (_recognition) _recognition.stop();
+
+  var btn = document.getElementById('submit-btn');
+  btn.disabled    = true;
   btn.textContent = '⏳ שולח...';
 
-  const done   = [...checkedTasks].map(id => {
-    const t = allTasks.find(x => x.id === id);
-    return t ? t.task_text : '';
-  }).filter(Boolean);
-  const extra  = document.getElementById('extra-task').value.trim();
-  if (extra) done.push(extra);
-  const issues = document.getElementById('issues-text').value.trim();
-  const wCount = parseInt(document.getElementById('workers-count').value) || 0;
-  const wNames = document.getElementById('workers-names').value.trim();
-  const today  = new Date().toISOString().split('T')[0];
-
-  const report = {
-    contractor_id:   contractorId,
-    contractor_name: contractorName,
-    project_id:      projectId || null,
-    project_name:    projectName || null,
-    report_date:     today,
-    tasks_done:      JSON.stringify(done),
-    issues:          issues || null,
-    workers_count:   wCount,
-    workers_names:   wNames || null,
-    day_rating:      currentRating,
-    status:          'pending',
-    submitted_at:    new Date().toISOString(),
-  };
-
   try {
-    // Save to Supabase
-    const res = await fetch(SB_URL + '/rest/v1/site_reports', {
-      method: 'POST',
-      headers: {
-        apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY,
-        'Content-Type': 'application/json', Prefer: 'return=minimal'
-      },
-      body: JSON.stringify(report)
+    var today = new Date().toISOString().slice(0,10);
+    var now   = new Date().toISOString();
+
+    var payload = {
+      // ── matched exactly to site_reports table columns ──────────
+      contractor_id:   requestData ? requestData.contractor_id   : null,
+      project_id:      requestData ? requestData.project_id      : null,
+      contractor_name: requestData ? requestData.contractor_name : submittedBy,
+      project_name:    requestData ? requestData.project_name    : null,
+      request_id:      requestData ? requestData.id              : null,
+      report_date:     requestData ? requestData.report_date     : today,
+      submitted_by:    submittedBy,
+      weather:         weather   || null,
+      workers_count:   workers,
+      activities:      activities,                        // → activities column
+      tasks_done:      activities,                        // → legacy tasks_done column (same value)
+      tools_equipment: document.getElementById('f-tools').value.trim()   || null,
+      issues:          document.getElementById('f-issues').value.trim()  || null,
+      remarks:         document.getElementById('f-remarks').value.trim() || null,
+      day_rating:      rating    || null,
+      photos:          photos.length ? photos : [],       // jsonb — NOT JSON.stringify
+      photo_url:       photos.length ? photos[0] : null, // legacy single photo_url column
+      status:          'pending',
+      submitted_at:    now
+    };
+
+    // ── INSERT site_reports ──────────────────────────────────────
+    var r1 = await fetch(SB_URL + '/rest/v1/site_reports', {
+      method:  'POST',
+      headers: { ...SB_H, Prefer: 'return=representation' },
+      body:    JSON.stringify(payload)
     });
-    if (!res.ok) throw new Error('שגיאת שמירה: HTTP ' + res.status);
 
-    // Build WhatsApp message to Beni
-    const stars  = currentRating > 0 ? '⭐'.repeat(currentRating) : 'לא דורג';
-    const waMsg  =
-      '📋 *דוח יומי — Site Pulse*\n' +
-      '━━━━━━━━━━━━━━━━━━━━\n' +
-      '👷 קבלן: ' + contractorName + '\n' +
-      (projectName ? '🏗️ פרויקט: ' + projectName + '\n' : '') +
-      '📅 תאריך: ' + new Date().toLocaleDateString('he-IL') + '\n\n' +
-      '✅ *בוצע היום:*\n' +
-      (done.length > 0 ? done.map(t => '• ' + t).join('\n') : '• לא דווח') + '\n\n' +
-      '👷 *עובדים באתר:* ' + wCount + (wNames ? '\n' + wNames : '') + '\n\n' +
-      (issues ? '🔴 *בעיות:* ' + issues + '\n\n' : '') +
-      '⭐ *דירוג יום:* ' + stars + '\n' +
-      '━━━━━━━━━━━━━━━━━━━━\n' +
-      '_נשלח דרך Site Pulse_';
+    // Get detailed error if 400
+    if (!r1.ok) {
+      var errBody = await r1.text();
+      throw new Error('400: ' + errBody);
+    }
 
-    // Show success first, then open WhatsApp
-    document.getElementById('success-summary').innerHTML =
-      '<b>' + contractorName + '</b><br>' +
-      new Date().toLocaleDateString('he-IL') + '<br>' +
-      done.length + ' משימות · ' + wCount + ' עובדים · ' + stars;
+    var saved = await r1.json();
+    var savedId = saved[0] && saved[0].id ? saved[0].id : null;
 
-    showScreen('success');
+    // ── UPDATE site_pulse_requests → submitted ───────────────────
+    if (requestData) {
+      await fetch(SB_URL + '/rest/v1/site_pulse_requests?id=eq.' + requestData.id, {
+        method:  'PATCH',
+        headers: { ...SB_H, Prefer: 'return=minimal' },
+        body:    JSON.stringify({ status: 'submitted', submitted_at: now })
+      });
+    }
 
-    // Open WhatsApp to Beni
-    setTimeout(() => {
-      window.open('https://wa.me/' + BENI_PHONE + '?text=' + encodeURIComponent(waMsg), '_blank');
-    }, 600);
+    // ── Success ──────────────────────────────────────────────────
+    var projectName = requestData ? requestData.project_name : 'הפרויקט';
+    showSuccess(
+      'הדוח נשלח בהצלחה!',
+      'תודה ' + submittedBy + '.\nהדוח עבור ' + projectName + ' התקבל אצל בני פרסקי.',
+      reportNum
+    );
 
   } catch(e) {
-    btn.disabled = false;
-    btn.textContent = '📤 שלח דוח לבני';
-    alert('שגיאה: ' + e.message + '\nנסה שוב.');
+    btn.disabled    = false;
+    btn.textContent = '✅ שלח דוח';
+    toast('שגיאה: ' + e.message);
+    console.error('submitReport error:', e);
   }
 }
 
-// ── HELPERS ──────────────────────────────────────────────
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
+// ── UTILS ─────────────────────────────────────────────────────────
+function formatDate(iso) {
+  if (!iso) return '—';
+  var d = new Date(iso);
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString('he-IL', {weekday:'short', day:'numeric', month:'numeric', year:'numeric'});
 }
-function showError(msg) {
-  document.getElementById('err-msg').textContent = msg;
-  showScreen('error');
-}
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;');
+var _tt;
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_tt);
+  _tt = setTimeout(function(){ el.classList.remove('show'); }, 3000);
 }
 </script>
 </body>
