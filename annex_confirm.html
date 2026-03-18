@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>אישור קבלת נספחים — Beni Persky</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Heebo,sans-serif;background:linear-gradient(135deg,#f0f7ff,#e8f4fd);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{background:#fff;border-radius:20px;padding:40px;max-width:540px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,0.12);}
+.logo{text-align:center;margin-bottom:28px;}
+.logo-name{font-size:22px;font-weight:900;color:#1a3d5c;}
+.logo-sub{font-size:13px;color:#888;margin-top:4px;}
+h1{font-size:20px;font-weight:900;color:#1a3d5c;text-align:center;margin-bottom:8px;}
+.subtitle{font-size:13px;color:#666;text-align:center;margin-bottom:24px;}
+.annex-list{border:1.5px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:24px;}
+.annex-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #f0f0f0;}
+.annex-row:last-child{border-bottom:none;}
+.annex-num{width:32px;height:32px;border-radius:8px;background:#1a3d5c;color:#fff;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.annex-info{flex:1;}
+.annex-title{font-size:13px;font-weight:700;color:#1a3d5c;}
+.annex-sub{font-size:11px;color:#888;margin-top:2px;}
+.annex-link{font-size:12px;color:#2d6a9f;text-decoration:none;font-weight:700;white-space:nowrap;}
+.annex-link:hover{text-decoration:underline;}
+.confirm-section{background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:20px;margin-bottom:20px;}
+.confirm-title{font-size:14px;font-weight:800;color:#15803d;margin-bottom:12px;text-align:center;}
+.form-group{margin-bottom:12px;}
+.form-group label{font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:4px;}
+.form-group input{width:100%;padding:10px 14px;border:1.5px solid #d1d5db;border-radius:8px;font-family:Heebo,sans-serif;font-size:14px;color:#1a1a1a;}
+.form-group input:focus{outline:none;border-color:#16a34a;}
+.checkbox-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;}
+.checkbox-row input[type=checkbox]{width:18px;height:18px;margin-top:2px;cursor:pointer;flex-shrink:0;}
+.checkbox-row label{font-size:12px;color:#444;line-height:1.5;cursor:pointer;}
+.btn-confirm{width:100%;padding:14px;background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:900;cursor:pointer;font-family:Heebo,sans-serif;transition:all .2s;}
+.btn-confirm:hover{opacity:0.9;}
+.btn-confirm:disabled{opacity:0.5;cursor:not-allowed;}
+/* States */
+.state{display:none;text-align:center;padding:20px 0;}
+.state.active{display:block;}
+.state-icon{font-size:64px;margin-bottom:16px;}
+.state-title{font-size:22px;font-weight:900;margin-bottom:8px;}
+.state-sub{font-size:14px;color:#666;line-height:1.6;}
+.loading-spin{width:48px;height:48px;border:4px solid #e2e8f0;border-top-color:#16a34a;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div class="logo-name">🏗️ בני פרסקי</div>
+    <div class="logo-sub">ניהול פרויקטים | Construction Management</div>
+  </div>
+
+  <!-- Loading state -->
+  <div class="state active" id="state-loading">
+    <div class="loading-spin"></div>
+    <div style="color:#888;font-size:14px;">טוען נספחים...</div>
+  </div>
+
+  <!-- Error state -->
+  <div class="state" id="state-error">
+    <div class="state-icon">❌</div>
+    <div class="state-title" style="color:#dc2626;">קישור לא תקין</div>
+    <div class="state-sub">הקישור שקיבלת אינו תקין או פג תוקפו.<br>פנה לבני פרסקי לקבלת קישור חדש.</div>
+  </div>
+
+  <!-- Already confirmed state -->
+  <div class="state" id="state-already">
+    <div class="state-icon">✅</div>
+    <div class="state-title" style="color:#15803d;">אישרת כבר!</div>
+    <div class="state-sub" id="already-msg">קבלת נספחים אושרה בעבר.</div>
+  </div>
+
+  <!-- Main content -->
+  <div class="state" id="state-main">
+    <h1 id="main-title">אישור קבלת נספחי בטיחות</h1>
+    <div class="subtitle" id="main-subtitle">קרא את הנספחים הבאים, הורד והחתם. לאחר מכן אשר קבלה.</div>
+
+    <div class="annex-list" id="annex-list">
+      <!-- filled by JS -->
+    </div>
+
+    <div class="confirm-section">
+      <div class="confirm-title">✍️ אישור קבלה — Confirmation of Receipt</div>
+      <div class="form-group">
+        <label>שמך המלא (כפי שיופיע באישור) *</label>
+        <input type="text" id="confirm-name" placeholder="שם פרטי ושם משפחה">
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="confirm-check">
+        <label for="confirm-check">
+          אני מאשר/ת כי קראתי, הבנתי וקיבלתי את כל הנספחים המפורטים לעיל, ומתחייב/ת לפעול בהתאם להוראותיהם.
+          <br><span style="color:#888;font-style:italic;">I confirm that I have read, understood and received all listed annexes and commit to comply with them.</span>
+        </label>
+      </div>
+      <button class="btn-confirm" id="btn-confirm" onclick="submitConfirmation()">
+        ✅ אני מאשר קבלת כל הנספחים
+      </button>
+    </div>
+  </div>
+
+  <!-- Success state -->
+  <div class="state" id="state-success">
+    <div class="state-icon">🎉</div>
+    <div class="state-title" style="color:#15803d;">אישור התקבל!</div>
+    <div class="state-sub" id="success-msg">תודה. האישור שלך נרשם ויועבר לבני פרסקי.</div>
+  </div>
+</div>
+
+<script>
+var SB_URL = 'https://vmcipofovheztbjmhwsl.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtY2lwb2ZvdmhlenRiam1od3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NjE2MTcsImV4cCI6MjA4NzAzNzYxN30.LPq5N2Xo8iEqjgz2UhmdzUdh5tpGT3EYzSxJcYBEJ1w';
+var STORAGE_BASE = SB_URL + '/storage/v1/object/public/app-assets/annexes/';
+
+var ANNEX_META = {
+  '01': 'ציוד מגן אישי (PPE)',
+  '02': 'עבודה בחללים מוקפים (Confined Space)',
+  '03': 'עבודה בגובה (Work at Heights)',
+  '04': 'עבודה בשעות חושך (Dark Hours)',
+  '05': 'עבודות חפירה ותעלות (Excavations)',
+  '06': 'מגבלות מזג אוויר (Weather Limitations)',
+  '07': 'איסור עישון (Smoking Regulation)',
+  '08': 'עבודה תחת מנוף (Working under a Crane)',
+  '09': 'תכנון מקדים (Pre-task Planning)',
+  '10': 'ציות לחוק ותקנות (Additional Regulation)',
+  '11': 'ביטוח צד שלישי ועובדים (Insurance)',
+  '12': 'הוראות נוספות חובה (Additional Mandatory)',
+};
+
+var _token = null;
+var _record = null;
+
+function showState(id) {
+  ['loading','error','already','main','success'].forEach(function(s){
+    var el = document.getElementById('state-'+s);
+    if (el) el.classList.toggle('active', s === id);
+  });
+}
+
+async function init() {
+  _token = new URLSearchParams(window.location.search).get('token');
+  if (!_token) { showState('error'); return; }
+
+  try {
+    var res = await fetch(
+      SB_URL + '/rest/v1/contractor_annexes_sent?confirm_token=eq.' + _token + '&select=*',
+      { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } }
+    );
+    var rows = await res.json();
+    if (!rows || !rows.length) { showState('error'); return; }
+    _record = rows[0];
+
+    if (_record.status === 'confirmed') {
+      var d = new Date(_record.confirmed_at).toLocaleDateString('he-IL');
+      document.getElementById('already-msg').textContent =
+        'אישרת קבלה ב-' + d + '. תודה, ' + (_record.confirmed_by || '') + '!';
+      showState('already');
+      return;
+    }
+
+    // Fill UI
+    document.getElementById('main-title').textContent =
+      'אישור קבלת נספחי בטיחות — ' + (_record.contractor_name || '');
+    if (_record.project_name) {
+      document.getElementById('main-subtitle').textContent =
+        'פרויקט: ' + _record.project_name + ' | קרא כל נספח, הורד והחתם, ואשר קבלה.';
+    }
+
+    var annexes = _record.annexes_sent || [];
+    var list = document.getElementById('annex-list');
+    list.innerHTML = '';
+    annexes.forEach(function(num, i) {
+      var title = ANNEX_META[num] || 'נספח ' + num;
+      var pdfUrl = STORAGE_BASE + 'annex_' + num + '.pdf';
+      var row = document.createElement('div');
+      row.className = 'annex-row';
+      row.innerHTML =
+        '<div class="annex-num">' + (i+1) + '</div>' +
+        '<div class="annex-info">' +
+          '<div class="annex-title">נספח ' + num + ' — ' + title + '</div>' +
+          '<div class="annex-sub">לחץ להורדה / קריאה</div>' +
+        '</div>' +
+        '<a href="' + pdfUrl + '" target="_blank" class="annex-link">📄 פתח PDF</a>';
+      list.appendChild(row);
+    });
+
+    // Enable button on checkbox change
+    document.getElementById('confirm-check').addEventListener('change', function() {
+      var name = document.getElementById('confirm-name').value.trim();
+      document.getElementById('btn-confirm').disabled = !(this.checked && name.length > 1);
+    });
+    document.getElementById('confirm-name').addEventListener('input', function() {
+      var checked = document.getElementById('confirm-check').checked;
+      document.getElementById('btn-confirm').disabled = !(checked && this.value.trim().length > 1);
+    });
+    document.getElementById('btn-confirm').disabled = true;
+
+    showState('main');
+  } catch(e) {
+    showState('error');
+    console.error(e);
+  }
+}
+
+async function submitConfirmation() {
+  var name = document.getElementById('confirm-name').value.trim();
+  if (!name || !document.getElementById('confirm-check').checked) return;
+  var btn = document.getElementById('btn-confirm');
+  btn.disabled = true;
+  btn.textContent = '⏳ שולח אישור...';
+  try {
+    var res = await fetch(
+      SB_URL + '/rest/v1/contractor_annexes_sent?confirm_token=eq.' + _token,
+      {
+        method: 'PATCH',
+        headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY,
+                   'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          status: 'confirmed',
+          confirmed_at: new Date().toISOString(),
+          confirmed_by: name
+        })
+      }
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    document.getElementById('success-msg').textContent =
+      'תודה ' + name + '! האישור שלך נרשם ויועבר לבני פרסקי.';
+    showState('success');
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '✅ אני מאשר קבלת כל הנספחים';
+    alert('שגיאה: ' + e.message);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
